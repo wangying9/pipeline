@@ -1,0 +1,54 @@
+name: Model CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Allows manual trigger of the pipeline
+
+jobs:
+  validate-model:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python environment
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run model validation
+        run: |
+          python model_validation_iris.py
+
+      # - name: Deploy model if validated
+        # run: |
+          # If model validation is successful, deploy the model (replace with your deployment logic)
+          # python deploy_model.py  # This would deploy your validated model to production
+
+  monitor-model:
+    runs-on: ubuntu-latest
+    needs: validate-model  # Ensure that monitoring only starts after validation
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python environment
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run model monitoring
+        run: |
+          python model_monitoring_iris.py
